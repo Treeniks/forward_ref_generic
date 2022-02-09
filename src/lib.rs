@@ -1,4 +1,35 @@
 #[macro_export]
+macro_rules! forward_ref_unop {
+    (
+        $( [ $($generic:tt)* ] )?
+        impl Neg for $type:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        forward_ref_unop! {
+            $( [ $($generic)* ] )?
+            impl Neg, neg for $type
+            $( where $($bound)* )?
+        }
+    };
+    (
+        $( [ $($generic:tt)* ] )?
+        impl $impl:ident, $meth:ident for $type:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        impl$(<$($generic)*>)? $impl for &$type
+        $(where
+            $($bound)*)?
+        {
+            type Output = <$type as $impl>::Output;
+
+            fn $meth(self) -> Self::Output {
+                <$type>::$meth(*self)
+            }
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! forward_ref_binop {
     (
         $( [ $($generic:tt)* ] )?
