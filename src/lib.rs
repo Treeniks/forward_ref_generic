@@ -11,6 +11,7 @@ macro_rules! forward_ref_unop {
             $( where $($bound)* )?
         }
     };
+
     (
         $( [ $($generic:tt)* ] )?
         impl $impl:ident, $meth:ident for $type:ty
@@ -88,6 +89,7 @@ macro_rules! forward_ref_binop {
             $( where $($bound)* )?
         }
     };
+
     (
         $( [ $($generic:tt)* ] )?
         impl $impl:ident, $meth:ident for $lhs:ty, $rhs:ty
@@ -123,6 +125,82 @@ macro_rules! forward_ref_binop {
 
             fn $meth(self, rhs: &$rhs) -> Self::Output {
                 <$lhs>::$meth(*self, *rhs)
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! forward_ref_op_assign {
+    (
+        $( [ $($generic:tt)* ] )?
+        impl AddAssign for $lhs:ty $(, $rhs:ty )?
+        $( where $($bound:tt)* )?
+    ) => {
+        forward_ref_op_assign! {
+            $( [ $($generic)* ] )?
+            impl AddAssign, add_assign for $lhs $(, $rhs )?
+            $( where $($bound)* )?
+        }
+    };
+    (
+        $( [ $($generic:tt)* ] )?
+        impl SubAssign for $lhs:ty $(, $rhs:ty )?
+        $( where $($bound:tt)* )?
+    ) => {
+        forward_ref_op_assign! {
+            $( [ $($generic)* ] )?
+            impl SubAssign, sub_assign for $lhs $(, $rhs )?
+            $( where $($bound)* )?
+        }
+    };
+    (
+        $( [ $($generic:tt)* ] )?
+        impl MulAssign for $lhs:ty $(, $rhs:ty )?
+        $( where $($bound:tt)* )?
+    ) => {
+        forward_ref_op_assign! {
+            $( [ $($generic)* ] )?
+            impl MulAssign, mul_assign for $lhs $(, $rhs )?
+            $( where $($bound)* )?
+        }
+    };
+    (
+        $( [ $($generic:tt)* ] )?
+        impl DivAssign for $lhs:ty $(, $rhs:ty )?
+        $( where $($bound:tt)* )?
+    ) => {
+        forward_ref_op_assign! {
+            $( [ $($generic)* ] )?
+            impl DivAssign, div_assign for $lhs $(, $rhs )?
+            $( where $($bound)* )?
+        }
+    };
+
+    // if no RHS was given, assume RHS = LHS
+    (
+        $( [ $($generic:tt)* ] )?
+        impl $impl:ident, $meth:ident for $lhs:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        forward_ref_op_assign! {
+            $( [ $($generic)* ] )?
+            impl $impl, $meth for $lhs, $lhs
+            $( where $($bound)* )?
+        }
+    };
+
+    (
+        $( [ $($generic:tt)* ] )?
+        impl $impl:ident, $meth:ident for $lhs:ty, $rhs:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        impl$(<$($generic)*>)? $impl<&$rhs> for $lhs
+        $(where
+            $($bound)*)?
+        {
+            fn $meth(&mut self, rhs: &$rhs) {
+                <$lhs>::$meth(self, *rhs)
             }
         }
     };
