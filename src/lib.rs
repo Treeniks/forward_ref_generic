@@ -124,7 +124,7 @@
 //!
 //! And now we would have to add implementations for `&Point + Point` and `&Point + &Point` as well.
 //! But that is very verbose and annoying to do.
-//! Instead, we can use `forward_ref_binop`:
+//! Instead, we can use [`forward_ref_binop`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.forward_ref_binop.html):
 //!
 //! ```
 //! # use std::ops::Add;
@@ -160,7 +160,7 @@
 //! ## Support for generics
 //!
 //! Let's generalize our `Point` struct so that it supports members of any type.
-//! We can still use `forward_ref_binop` in that case, but we'll need to tell the macro which generics we used.
+//! We can still use [`forward_ref_binop`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.forward_ref_binop.html) in that case, but we'll need to tell the macro which generics we used.
 //! We will also need to tell it all trait bounds that are required.
 //! Note that, for technical reasons, we'll need to add angled brackets `[]` around the list of generics.
 //!
@@ -185,7 +185,7 @@
 //!     }
 //! }
 //!
-//! // for the exact syntax required by each macro, look at the macro's documentation page
+//! // for the exact syntax required by each macro, refer to the macro's documentation page
 //! forward_ref_binop! {
 //!     [T]
 //!     impl Add for Point<T>
