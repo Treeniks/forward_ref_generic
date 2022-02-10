@@ -9,7 +9,7 @@ This crate serves as a standalone extension of [forward_ref](https://crates.io/c
 
 The `forward_ref_*` macros are macros [used by the rust's core library](https://github.com/rust-lang/rust/blob/e7aca895980f25f6d2d3c48e10fd04656764d1e4/library/core/src/internal_macros.rs) to more easily implement Operations on primitive types.
 When implementing an operation `op` like [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html) or [`Mul`](https://doc.rust-lang.org/std/ops/trait.Mul.html) for a type `T`, the [`std::ops` documentation](https://doc.rust-lang.org/std/ops) recommends implementing the operation not just for `T op T` but also for `T op &T`, `&T op T` and `&T op &T`.
-In practice, the implementations of those variants for `Copy` types is somewhat trivial and combersome to do.
+In practice, the implementations of those variants for `Copy` types is somewhat trivial and cumbersome to do.
 Since those trivial implementations are basically the same for all `Copy` types, one can use the `forward_ref_*` macros to get them implemented automatically.
 
 There are existing solutions for this (one of them the aforementioned [forward_ref](https://crates.io/crates/forward_ref) crate, as well as [impl_ops](https://crates.io/crates/impl_ops)), however none of them (or at least none I could find) support generic types.
@@ -18,8 +18,8 @@ This crate offers macros that also support generic types, including trait bounds
 
 There are seperate macros offered for types of operations:
 * Unary Operators like [`Neg`](https://doc.rust-lang.org/std/ops/trait.Neg.html): [`forward_ref_unop`](https://docs.rs/forward_ref_generic/macro.forward_ref_unop.html)
-* Binary Operators like [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html): [`forward_ref_binop`]((https://docs.rs/forward_ref_generic/macro.forward_ref_binop.html))
-* Assignment Operators like [`AddAssign`](https://doc.rust-lang.org/std/ops/trait.AddAssign.html): [`forward_ref_op_assign`]((https://docs.rs/forward_ref_generic/macro.forward_ref_op_assign.html))
+* Binary Operators like [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html): [`forward_ref_binop`](https://docs.rs/forward_ref_generic/macro.forward_ref_binop.html)
+* Assignment Operators like [`AddAssign`](https://doc.rust-lang.org/std/ops/trait.AddAssign.html): [`forward_ref_op_assign`](https://docs.rs/forward_ref_generic/macro.forward_ref_op_assign.html)
 
 ## Usage
 
