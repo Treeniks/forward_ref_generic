@@ -1,6 +1,6 @@
 [package]
 name = "forward_ref_generic"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Thomas Lindae <thomas.lindae@in.tum.de>"]
 edition = "2021"
 description = "Generically forward references for operations on Copy types."

@@ -83,8 +83,6 @@ impl Add<&Point> for Point {
     }
 }
 
-# let p1 = Point { x: 3, y: 3 };
-# let p2 = Point { x: 5, y: 2 };
 let p3 = &p2;
 assert_eq!(p1 + &p2, Point { x: 8, y: 5 });
 assert_eq!(p1 + p3, Point { x: 8, y: 5 });
