@@ -1,8 +1,10 @@
 [package]
 name = "forward_ref_generic"
 version = "0.1.0"
+authors = ["Thomas Lindae <thomas.lindae@in.tum.de>"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Generically forward references for operations on Copy types."
+license = "MIT"
+repository = "https://github.com/Treeniks/forward_ref_generic"
 
 [dependencies]
