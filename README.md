@@ -13,7 +13,7 @@ In practice, the implementations of those variants for `Copy` types is somewhat 
 Since those trivial implementations are basically the same for all `Copy` types, one can use the `forward_ref_*` macros to get them implemented automatically.
 
 There are existing solutions for this (one of them the aforementioned [forward_ref](https://crates.io/crates/forward_ref) crate, as well as [impl_ops](https://crates.io/crates/impl_ops)), however none of them (or at least none I could find) support generic types.
-That is to say, if one has a type like `Point<T>(x: T, y: T)`, so far it was necessary to implement all variants by hand.
+That is to say, if one has a type like `Point<T> {x: T, y: T}`, so far it was necessary to implement all variants by hand.
 This crate offers macros that also support generic types, including trait bounds, so the only assumption left is that the type the operation is implemented on is `Copy`.
 
 There are seperate macros offered for types of operations:
