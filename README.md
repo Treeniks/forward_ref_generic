@@ -17,9 +17,9 @@ That is to say, if one has a type like `Point<T>(x: T, y: T)`, so far it was nec
 This crate offers macros that also support generic types, including trait bounds, so the only assumption left is that the type the operation is implemented on is `Copy`.
 
 There are seperate macros offered for types of operations:
-* Unary Operators like [`Neg`](https://doc.rust-lang.org/std/ops/trait.Neg.html): [`forward_ref_unop`](https://docs.rs/forward_ref_generic/macro.forward_ref_unop.html)
-* Binary Operators like [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html): [`forward_ref_binop`](https://docs.rs/forward_ref_generic/macro.forward_ref_binop.html)
-* Assignment Operators like [`AddAssign`](https://doc.rust-lang.org/std/ops/trait.AddAssign.html): [`forward_ref_op_assign`](https://docs.rs/forward_ref_generic/macro.forward_ref_op_assign.html)
+* Unary Operators like [`Neg`](https://doc.rust-lang.org/std/ops/trait.Neg.html): [`forward_ref_unop`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.forward_ref_unop.html)
+* Binary Operators like [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html): [`forward_ref_binop`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.forward_ref_binop.html)
+* Assignment Operators like [`AddAssign`](https://doc.rust-lang.org/std/ops/trait.AddAssign.html): [`forward_ref_op_assign`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.forward_ref_op_assign.html)
 
 ## Usage
 
@@ -30,7 +30,7 @@ Add this to your `Cargo.toml`:
 forward_ref_generic = "0.1"
 ```
 
-For usage of the macros, refer to [the documentation](https://crates.io/crates/forward_ref_generic) or see the examples below.
+For usage of the macros, refer to [the documentation](https://docs.rs/forward_ref_generic) or see the examples below.
 
 ## Examples
 
