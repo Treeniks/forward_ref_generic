@@ -344,7 +344,7 @@
 //!
 //! There are also macros to automatically make an operation commutative. That is, for two types `T` and `U`, if `T binop U` is implemented, then one can use [`commutative_binop`] to automatically implement `U binop T`. If `T` and `U` are additionally `Copy`, then `T binop &U`, `&T binop U`, `&T binop &U`, `U binop &T`, `&U binop T` and `&U binop &T` can automatically be implemented with [`forward_ref_commutative_binop`].
 //!
-//! ```rust
+//! ```
 //! use std::ops::Add;
 //! use forward_ref_generic::{commutative_binop, forward_ref_commutative_binop};
 //!
@@ -456,7 +456,6 @@ macro_rules! forward_ref_unop {
 ///
 /// Note in particular that `LHS` and `RHS` denote the left and right side of the **original** operation, not the one being created. The reason for this is to be consistent with all other macros in this crate, even if it seems unintuitive.
 #[macro_export]
-#[cfg(feature = "commutative")]
 macro_rules! commutative_binop {
     (
         $( [ $($generic:tt)* ] )?
@@ -632,7 +631,6 @@ macro_rules! forward_ref_binop {
 /// - `RHS` is the type of the right hand side of the original operation (i.e. `U`)
 /// - `Bounds` are comma-seperated trait bounds for the listed generics
 #[macro_export]
-#[cfg(feature = "commutative")]
 macro_rules! forward_ref_commutative_binop {
     (
         $( [ $($generic:tt)* ] )?
