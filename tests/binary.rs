@@ -1,3 +1,4 @@
+#[allow(clipp:op_ref)]
 use forward_ref_generic::{commutative_binop, forward_ref_binop, forward_ref_commutative_binop};
 use std::ops::Add;
 

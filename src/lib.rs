@@ -521,6 +521,7 @@ macro_rules! forward_ref_binop {
 ///
 /// Note in particular that `LHS` and `RHS` denote the left and right side of the **original** operation, not the one being created. The reason for this is to be consistent with all other macros in this crate, even if it seems unintuitive.
 #[macro_export]
+#[cfg(feature = "commutative")]
 macro_rules! commutative_binop {
     (
         $( [ $($generic:tt)* ] )?
@@ -580,6 +581,7 @@ macro_rules! commutative_binop {
 /// - `RHS` is the type of the right hand side of the original operation (i.e. `U`)
 /// - `Bounds` are comma-seperated trait bounds for the listed generics
 #[macro_export]
+#[cfg(feature = "commutative")]
 macro_rules! forward_ref_commutative_binop {
     (
         $( [ $($generic:tt)* ] )?
