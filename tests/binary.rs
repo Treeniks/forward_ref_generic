@@ -1,4 +1,4 @@
-use forward_ref_generic::forward_ref_binop;
+use forward_ref_generic::{commutative_binop, forward_ref_binop, forward_ref_commutative_binop};
 use std::ops::Add;
 
 mod no_generic {
@@ -114,5 +114,57 @@ mod complicated_generics {
         assert_eq!(p1 + p2, p1 + &p2);
         assert_eq!(p1 + p2, &p1 + p2);
         assert_eq!(p1 + p2, &p1 + &p2);
+    }
+}
+
+mod commutative {
+    use super::{commutative_binop, forward_ref_commutative_binop, Add};
+
+    #[derive(Clone, Copy, PartialEq)]
+    struct Int1(i32);
+
+    #[derive(Clone, Copy, PartialEq)]
+    struct Int2(i32);
+
+    impl Add<Int2> for Int1 {
+        type Output = i32;
+
+        fn add(self, rhs: Int2) -> Self::Output {
+            self.0 + rhs.0
+        }
+    }
+
+    commutative_binop! {
+        impl Add for Int1, Int2
+    }
+
+    forward_ref_commutative_binop! {
+        impl Add for Int1, Int2
+    }
+
+    #[test]
+    fn add_commutative_only() {
+        let int1 = Int1(5);
+        let int2 = Int2(3);
+
+        assert_eq!(int1 + int2, 5 + 3);
+        assert_eq!(int2 + int1, 3 + 5);
+    }
+
+    #[test]
+    fn add_forward_ref_commutative() {
+        let int1 = Int1(5);
+        let int2 = Int2(3);
+
+        assert_eq!(int1 + int2, 5 + 3);
+        assert_eq!(int2 + int1, 3 + 5);
+
+        assert_eq!(&int1 + int2, 5 + 3);
+        assert_eq!(int1 + &int2, 5 + 3);
+        assert_eq!(&int1 + &int2, 5 + 3);
+
+        assert_eq!(&int2 + int1, 3 + 5);
+        assert_eq!(int2 + &int1, 3 + 5);
+        assert_eq!(&int2 + &int1, 3 + 5);
     }
 }
