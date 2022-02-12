@@ -27,7 +27,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-forward_ref_generic = "0.1"
+forward_ref_generic = "0.2"
 ```
 
 For usage of the macros, refer to [the documentation](https://docs.rs/forward_ref_generic) or see the examples below.
