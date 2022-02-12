@@ -252,6 +252,53 @@ assert_eq!(!&Answer::Yes, Answer::No);
 assert_eq!(!&Answer::No, Answer::Yes);
 ```
 
-## TODO
+### Making an operation commutative
 
-It is planned to add macros that automatically make an operation commutative.
+There are also macros to automatically make an operation commutative. That is, for two types `T` and `U`, if `T binop U` is implemented, then one can use [`commutative_binop`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.commutative_binop.html) to automatically implement `U binop T`. If `T` and `U` are additionally `Copy`, then `T binop &U`, `&T binop U`, `&T binop &U`, `U binop &T`, `&U binop T` and `&U binop &T` can automatically be implemented with [`forward_ref_commutative_binop`](https://docs.rs/forward_ref_generic/*/forward_ref_generic/macro.forward_ref_commutative_binop.html).
+
+```rust
+use std::ops::Add;
+use forward_ref_generic::{commutative_binop, forward_ref_commutative_binop};
+
+// two wrappers for integers
+#[derive(Clone, Copy, PartialEq)]
+struct Int1(i32);
+
+#[derive(Clone, Copy, PartialEq)]
+struct Int2(i32);
+
+impl Add<Int2> for Int1 {
+    type Output = i32;
+
+    fn add(self, rhs: Int2) -> Self::Output {
+        self.0 + rhs.0
+    }
+}
+
+// note that the order of `LHS` and `RHS` is that
+// of the original operation's implementation
+// not that of the created one
+commutative_binop! {
+    impl Add for Int1, Int2
+}
+
+// the order of `LHS` and `RHS` here doesn't matter
+// as `LHS binop RHS` and `RHS binop LHS` are both required anyway
+forward_ref_commutative_binop! {
+    impl Add for Int1, Int2
+}
+
+let i1 = Int1(5);
+let i2 = Int2(3);
+
+assert_eq!(i1 + i2, 8);
+assert_eq!(i2 + i1, 8);
+
+assert_eq!(&i1 + i2, 8);
+assert_eq!(i1 + &i2, 8);
+assert_eq!(&i1 + &i2, 8);
+
+assert_eq!(&i2 + i1, 8);
+assert_eq!(i2 + &i1, 8);
+assert_eq!(&i2 + &i1, 8);
+```

@@ -339,6 +339,57 @@
 //! assert_eq!(!&Answer::Yes, Answer::No);
 //! assert_eq!(!&Answer::No, Answer::Yes);
 //! ```
+//!
+//! ### Making an operation commutative
+//!
+//! There are also macros to automatically make an operation commutative. That is, for two types `T` and `U`, if `T binop U` is implemented, then one can use [`commutative_binop`] to automatically implement `U binop T`. If `T` and `U` are additionally `Copy`, then `T binop &U`, `&T binop U`, `&T binop &U`, `U binop &T`, `&U binop T` and `&U binop &T` can automatically be implemented with [`forward_ref_commutative_binop`].
+//!
+//! ```rust
+//! use std::ops::Add;
+//! use forward_ref_generic::{commutative_binop, forward_ref_commutative_binop};
+//!
+//! // two wrappers for integers
+//! #[derive(Clone, Copy, PartialEq)]
+//! struct Int1(i32);
+//!
+//! #[derive(Clone, Copy, PartialEq)]
+//! struct Int2(i32);
+//!
+//! impl Add<Int2> for Int1 {
+//!     type Output = i32;
+//!
+//!     fn add(self, rhs: Int2) -> Self::Output {
+//!         self.0 + rhs.0
+//!     }
+//! }
+//!
+//! // note that the order of `LHS` and `RHS` is that
+//! // of the original operation's implementation
+//! // not that of the created one
+//! commutative_binop! {
+//!     impl Add for Int1, Int2
+//! }
+//!
+//! // the order of `LHS` and `RHS` here doesn't matter
+//! // as `LHS binop RHS` and `RHS binop LHS` are both required anyway
+//! forward_ref_commutative_binop! {
+//!     impl Add for Int1, Int2
+//! }
+//!
+//! let i1 = Int1(5);
+//! let i2 = Int2(3);
+//!
+//! assert_eq!(i1 + i2, 8);
+//! assert_eq!(i2 + i1, 8);
+//!
+//! assert_eq!(&i1 + i2, 8);
+//! assert_eq!(i1 + &i2, 8);
+//! assert_eq!(&i1 + &i2, 8);
+//!
+//! assert_eq!(&i2 + i1, 8);
+//! assert_eq!(i2 + &i1, 8);
+//! assert_eq!(&i2 + &i1, 8);
+//! ```
 
 /// For a type `T: Copy` which has unary operator `unop` implemented, also implement `unop &T`.
 ///
@@ -381,6 +432,68 @@ macro_rules! forward_ref_unop {
 
             fn $meth(self) -> Self::Output {
                 <$type>::$meth(*self)
+            }
+        }
+    };
+}
+
+/// For types `T`, `U` for which binary operator `binop` is implemented (`T binop U`), also implement `U binop T`.
+/// This macro will fail if `LHS` = `RHS`.
+///
+/// For readability, the expected syntax of the macro is the following:
+/// ```text
+/// ( [ Generics ] )?
+/// impl Trait, Method for LHS(, RHS)?
+/// ( where Bounds )?
+/// ```
+/// - `Generics` are comma-seperated type or const generics
+/// - `Trait` is the trait to be implemented
+/// - `Method` is the method that `Trait` defines\
+///   (can be ommitted for [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html) and [`Mul`](https://doc.rust-lang.org/std/ops/trait.Mul.html))
+/// - `LHS` is the type of the left hand side of the original operation (i.e. `T`)
+/// - `RHS` is the type of the right hand side of the original operation (i.e. `U`)
+/// - `Bounds` are comma-seperated trait bounds for the listed generics
+///
+/// Note in particular that `LHS` and `RHS` denote the left and right side of the **original** operation, not the one being created. The reason for this is to be consistent with all other macros in this crate, even if it seems unintuitive.
+#[macro_export]
+#[cfg(feature = "commutative")]
+macro_rules! commutative_binop {
+    (
+        $( [ $($generic:tt)* ] )?
+        impl Add for $lhs:ty, $rhs:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        commutative_binop! {
+            $( [ $($generic)* ] )?
+            impl Add, add for $lhs, $rhs
+            $( where $($bound)* )?
+        }
+    };
+    (
+        $( [ $($generic:tt)* ] )?
+        impl Mul for $lhs:ty, $rhs:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        commutative_binop! {
+            $( [ $($generic)* ] )?
+            impl Mul, mul for $lhs, $rhs
+            $( where $($bound)* )?
+        }
+    };
+
+    (
+        $( [ $($generic:tt)* ] )?
+        impl $impl:ident, $meth:ident for $lhs:ty, $rhs:ty
+        $( where $($bound:tt)* )?
+    ) => {
+        impl$(<$($generic)*>)? $impl<$lhs> for $rhs
+        $(where
+            $($bound)*)?
+        {
+            type Output = <$lhs as $impl<$rhs>>::Output;
+
+            fn $meth(self, rhs: $lhs) -> Self::Output {
+                <$lhs>::$meth(rhs, self)
             }
         }
     };
@@ -502,68 +615,6 @@ macro_rules! forward_ref_binop {
     };
 }
 
-/// For types `T: Copy`, `U: Copy` for which binary operator `binop` is implemented (`T binop U`), also implement `U binop T`.
-/// This macro will fail if `LHS` = `RHS`.
-///
-/// For readability, the expected syntax of the macro is the following:
-/// ```text
-/// ( [ Generics ] )?
-/// impl Trait, Method for LHS(, RHS)?
-/// ( where Bounds )?
-/// ```
-/// - `Generics` are comma-seperated type or const generics
-/// - `Trait` is the trait to be implemented
-/// - `Method` is the method that `Trait` defines\
-///   (can be ommitted for [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html) and [`Mul`](https://doc.rust-lang.org/std/ops/trait.Mul.html))
-/// - `LHS` is the type of the left hand side of the original operation (i.e. `T`)
-/// - `RHS` is the type of the right hand side of the original operation (i.e. `U`)
-/// - `Bounds` are comma-seperated trait bounds for the listed generics
-///
-/// Note in particular that `LHS` and `RHS` denote the left and right side of the **original** operation, not the one being created. The reason for this is to be consistent with all other macros in this crate, even if it seems unintuitive.
-#[macro_export]
-#[cfg(feature = "commutative")]
-macro_rules! commutative_binop {
-    (
-        $( [ $($generic:tt)* ] )?
-        impl Add for $lhs:ty, $rhs:ty
-        $( where $($bound:tt)* )?
-    ) => {
-        commutative_binop! {
-            $( [ $($generic)* ] )?
-            impl Add, add for $lhs, $rhs
-            $( where $($bound)* )?
-        }
-    };
-    (
-        $( [ $($generic:tt)* ] )?
-        impl Mul for $lhs:ty, $rhs:ty
-        $( where $($bound:tt)* )?
-    ) => {
-        commutative_binop! {
-            $( [ $($generic)* ] )?
-            impl Mul, mul for $lhs, $rhs
-            $( where $($bound)* )?
-        }
-    };
-
-    (
-        $( [ $($generic:tt)* ] )?
-        impl $impl:ident, $meth:ident for $lhs:ty, $rhs:ty
-        $( where $($bound:tt)* )?
-    ) => {
-        impl$(<$($generic)*>)? $impl<$lhs> for $rhs
-        $(where
-            $($bound)*)?
-        {
-            type Output = <$lhs as $impl<$rhs>>::Output;
-
-            fn $meth(self, rhs: $lhs) -> Self::Output {
-                <$lhs>::$meth(rhs, self)
-            }
-        }
-    };
-}
-
 /// For types `T: Copy`, `U: Copy` for which binary operator `binop` is implemented commutatively (`T binop U` **and** `U binop T`), also implement `T binop &U`, `&T binop U`, `&T binop &U`, `U binop &T`, `&U binop T` and `&U binop &T`.
 /// This macro will fail if `LHS` = `RHS`.
 ///
@@ -611,13 +662,13 @@ macro_rules! forward_ref_commutative_binop {
         impl $impl:ident, $meth:ident for $lhs:ty, $rhs:ty
         $( where $($bound:tt)* )?
     ) => {
-        crate::forward_ref_binop! {
+        forward_ref_generic::forward_ref_binop! {
             $( [ $($generic)* ] )?
             impl $impl, $meth for $lhs, $rhs
             $( where $($bound)* )?
         }
 
-        crate::forward_ref_binop! {
+        forward_ref_generic::forward_ref_binop! {
             $( [ $($generic)* ] )?
             impl $impl, $meth for $rhs, $lhs
             $( where $($bound)* )?
